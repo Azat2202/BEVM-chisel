@@ -3,30 +3,30 @@ package gcd
 import chisel3._
 
 class AluInput extends Bundle{
-  val left = Input(UInt(16.W))
-  val right = Input(UInt(16.W))
-  val C = Input(Bool())
+  val left = UInt(16.W)
+  val right = UInt(16.W)
+  val C = Bool()
 }
 
 class AluOutput extends Bundle {
-  val data = Output(UInt(16.W))
-  val C = Output(Bool())
-  val C0 = Output(Bool())
-  val C14 = Output(Bool())
+  val data = UInt(16.W)
+  val C = Bool()
+  val C0 = Bool()
+  val C14 = Bool()
 }
 
 class AluFlags extends Bundle{
-  val COML = Input(Bool())
-  val SORA = Input(Bool())
-  val COMR = Input(Bool())
-  val PLS1 = Input(Bool())
+  val COML = Bool()
+  val SORA = Bool()
+  val COMR = Bool()
+  val PLS1 = Bool()
 }
 
 class Alu extends Module {
 
-  val input = IO(new AluInput())
-  val output = IO(new AluOutput())
-  val flags = IO(new AluFlags())
+  val input = IO(Input(new AluInput()))
+  val output = IO(Output(new AluOutput()))
+  val flags = IO(Input(new AluFlags()))
 
   private val leftInv = Wire(UInt(16.W))
   when(flags.COML){
