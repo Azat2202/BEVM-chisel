@@ -10,7 +10,7 @@ class CommutatorOutput extends Bundle {
   val C14  = Bool()
 }
 
-class CommutatorFlags extends Bundle {
+trait CommutatorFlags { this: Bundle =>
   val LTOL = Bool()
   val LTOH = Bool()
   val HTOL = Bool()
@@ -22,9 +22,11 @@ class CommutatorFlags extends Bundle {
   val SHRF = Bool()
 }
 
+class CommutatorFlagsImpl extends Bundle with CommutatorFlags {}
+
 class Commutator extends Module {
   val input  = IO(Input(new AluOutput()))
-  val flags  = IO(Input(new CommutatorFlags()))
+  val flags  = IO(Input(new CommutatorFlagsImpl()))
   val output = IO(Output(new CommutatorOutput()))
 
   private val inputHigh  = input.data(15, 8)
@@ -42,8 +44,8 @@ class Commutator extends Module {
     output.C   := input.C
     output.C14 := input.C14
   }
-  when(flags.LTOL)(outputLow := inputLow)
-  when(flags.HTOL)(outputLow := inputHigh)
+  when(flags.LTOL)(outputLow  := inputLow)
+  when(flags.HTOL)(outputLow  := inputHigh)
   when(flags.LTOH)(outputHigh := inputLow)
   when(flags.SEXT)(outputHigh := Fill(8, inputLow(7)))
   when(flags.SHLT && flags.SHL0) {

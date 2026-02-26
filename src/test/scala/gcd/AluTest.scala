@@ -82,7 +82,7 @@ class AluTest extends AnyFreeSpec with Matchers with ChiselSim {
 
   "ALU should handle overflow correctly" in
     simulate(new Alu) { dut =>
-      dut.input.left.poke(0xFFFF.U(16.W).asSInt)
+      dut.input.left.poke(0xffff.U(16.W).asSInt)
       dut.input.right.poke(1.S)
       dut.flags.SORA.poke(false.B)
       dut.flags.PLS1.poke(false.B)

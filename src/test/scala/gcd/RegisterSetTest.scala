@@ -5,10 +5,10 @@ import chisel3.simulator.scalatest.ChiselSim
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim{
+class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim {
 
-  "Register should be read and written" in {
-    simulate(new RegisterSet){ dut =>
+  "Register should be read and written" in
+    simulate(new RegisterSet) { dut =>
       dut.input.data.poke(0x5555.S)
       dut.input.N.poke(true.B)
       dut.input.Z.poke(true.B)
@@ -36,7 +36,6 @@ class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim{
       dut.output.left.expect(0x5555.S)
       dut.flags.RDAC.poke(false.B)
 
-
       dut.flags.RDAC.poke(true.B)
       dut.output.left.expect(0x5555.S)
       dut.flags.RDAC.poke(false.B)
@@ -46,7 +45,7 @@ class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim{
       dut.flags.RDBR.poke(false.B)
 
       dut.flags.RDPS.poke(true.B)
-      dut.output.left.expect(0x000F.S) // NZVC flags
+      dut.output.left.expect(0x000f.S) // NZVC flags
       dut.flags.RDPS.poke(false.B)
 
       dut.flags.RDIR.poke(true.B)
@@ -69,5 +68,4 @@ class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim{
       dut.output.right.expect(0x555.U(16.W).asSInt)
       dut.flags.RDSP.poke(false.B)
     }
-  }
 }

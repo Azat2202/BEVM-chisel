@@ -15,18 +15,20 @@ class AluOutput extends Bundle {
   val C14  = Bool()
 }
 
-class AluFlags extends Bundle {
+trait AluFlags { this: Bundle =>
   val COML = Bool()
   val SORA = Bool()
   val COMR = Bool()
   val PLS1 = Bool()
 }
 
+class ALuFlagsImpl extends Bundle with AluFlags {}
+
 class Alu extends Module {
 
   val input  = IO(Input(new AluInput()))
   val output = IO(Output(new AluOutput()))
-  val flags  = IO(Input(new AluFlags()))
+  val flags  = IO(Input(new ALuFlagsImpl()))
 
   private val leftInv = Wire(SInt(16.W))
   when(flags.COML) {

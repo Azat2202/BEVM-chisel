@@ -70,7 +70,6 @@ class RegisterAttributesBlockTest extends AnyFreeSpec with Matchers with ChiselS
       dut.output.V.expect(false.B)
     }
 
-
   "Commutator should set C for carry" in
     simulate(new ResultAttributesBlock) { dut =>
       dut.nzvc.C.poke(true.B)

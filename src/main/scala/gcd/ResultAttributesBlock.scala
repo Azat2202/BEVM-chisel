@@ -10,11 +10,13 @@ class ResultAttributesBlockOutput extends Bundle {
   val data = SInt(16.W)
 }
 
-class ResultAttributesBlockFlags extends Bundle {
+trait ResultAttributesBlockFlags { this: Bundle =>
   val SETV = Bool()
   val SETC = Bool()
   val SETZ = Bool()
 }
+
+class ResultAttributesBlockFlagsImpl extends Bundle with ResultAttributesBlockFlags {}
 
 class NZVCRegister extends Bundle {
   val N = Bool()
@@ -25,14 +27,14 @@ class NZVCRegister extends Bundle {
 
 class ResultAttributesBlock extends Module {
   val input  = IO(Input(new CommutatorOutput()))
-  val flags  = IO(Input(new ResultAttributesBlockFlags()))
+  val flags  = IO(Input(new ResultAttributesBlockFlagsImpl()))
   val nzvc   = IO(Input(new NZVCRegister()))
   val output = IO(Output(new ResultAttributesBlockOutput()))
 
-  output.N := input.data < 0.S
-  output.Z := nzvc.Z
-  output.V := nzvc.V
-  output.C := nzvc.C
+  output.N    := input.data < 0.S
+  output.Z    := nzvc.Z
+  output.V    := nzvc.V
+  output.C    := nzvc.C
   output.data := input.data
 
   when(flags.SETV) {

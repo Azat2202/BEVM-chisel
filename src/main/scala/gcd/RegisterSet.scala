@@ -30,7 +30,7 @@ object PSBits {
     )
 }
 
-class RegisterSetFlags extends Bundle {
+trait RegisterSetFlags { this: Bundle =>
   val WRAC = Bool()
   val RDAC = Bool()
   val WRBR = Bool()
@@ -51,12 +51,15 @@ class RegisterSetFlags extends Bundle {
   val STOR = Bool()
 }
 
+class RegisterSetFlagsImpl extends Bundle with RegisterSetFlags {}
+
 class RegisterSet extends Module {
-  val flags  = IO(Input(new RegisterSetFlags()))
-  val input = IO(Input(new ResultAttributesBlockOutput()))
-  val output = IO(Output(new AluInput()))
-  val memoryInput = IO(Output(new MemoryInput()))
+  val flags        = IO(Input(new RegisterSetFlagsImpl()))
+  val input        = IO(Input(new ResultAttributesBlockOutput()))
   val memoryOutput = IO(Input(new MemoryOutput()))
+  val output       = IO(Output(new AluInput()))
+  val memoryInput  = IO(Output(new MemoryInput()))
+  val nzvcOutput   = IO(Output(new ResultAttributesBlockOutput()))
 
   // left side
   private val AC = RegInit(UInt(16.W), 0.U)
@@ -74,13 +77,18 @@ class RegisterSet extends Module {
 
   // todo: memory IO
 
-  output.left  := 0.S
-  output.right := 0.S
-  output.C := PSBits.fromPS(PS).C
-  PS := PS | Cat(input.N, input.Z, input.V, input.C) // setting nzvc after operation
+  output.left         := 0.S
+  output.right        := 0.S
+  output.C            := PSBits.fromPS(PS).C
+  nzvcOutput.N        := PSBits.fromPS(PS).N
+  nzvcOutput.Z        := PSBits.fromPS(PS).Z
+  nzvcOutput.V        := PSBits.fromPS(PS).V
+  nzvcOutput.C        := PSBits.fromPS(PS).C
+  nzvcOutput.data     := DontCare
+  PS                  := PS | Cat(input.N, input.Z, input.V, input.C) // setting nzvc after operation
   memoryInput.address := AR
-  memoryInput.write := false.B
-  memoryInput.data := 0.U
+  memoryInput.write   := false.B
+  memoryInput.data    := 0.U
 
   when(flags.RDAC)(output.left := AC.asSInt)
   when(flags.RDBR)(output.left := BR.asSInt)
@@ -102,11 +110,11 @@ class RegisterSet extends Module {
   when(flags.WRAR)(AR := input.data.asUInt)
 
   // memory connection
-  when(flags.LOAD){
+  when(flags.LOAD) {
     DR := memoryOutput.data
   }
-  when(flags.STOR){
-    memoryInput.data := DR
+  when(flags.STOR) {
+    memoryInput.data  := DR
     memoryInput.write := true.B
   }
 
