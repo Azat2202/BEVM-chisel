@@ -61,10 +61,11 @@ class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
 
     dut.clock.step()
 
+    dut.topInput.writeToRegisters.poke(false.B)
     dut.flags.WRAR.poke(false.B)
     dut.flags.LOAD.poke(true.B)
 
-    dut.clock.step()
+    dut.clock.step(2) // we need to wait two cycles before data is available (first cycle write to AR, then LOAD)
     dut.flags.LOAD.poke(false.B)
   }
 
