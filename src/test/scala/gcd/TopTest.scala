@@ -50,6 +50,8 @@ class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
     dut.clock.step()
 
     dut.flags.STOR.poke(false.B)
+
+    dut.clock.step()
   }
 
   private def readMemoryToDR(dut: Top, address: UInt): Unit = {

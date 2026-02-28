@@ -75,15 +75,14 @@ class RegisterSet extends Module {
 
   private val AR = RegInit(UInt(11.W), 0.U)
 
-  // todo: memory IO
-
+  private val psBits = PSBits.fromPS(PS)
   output.left         := 0.S
   output.right        := 0.S
-  output.C            := PSBits.fromPS(PS).C
-  nzvcOutput.N        := PSBits.fromPS(PS).N
-  nzvcOutput.Z        := PSBits.fromPS(PS).Z
-  nzvcOutput.V        := PSBits.fromPS(PS).V
-  nzvcOutput.C        := PSBits.fromPS(PS).C
+  output.C            := psBits.C
+  nzvcOutput.N        := psBits.N
+  nzvcOutput.Z        := psBits.Z
+  nzvcOutput.V        := psBits.V
+  nzvcOutput.C        := psBits.C
   nzvcOutput.data     := DontCare
   PS                  := PS | Cat(input.N, input.Z, input.V, input.C) // setting nzvc after operation
   memoryInput.address := AR
@@ -116,6 +115,9 @@ class RegisterSet extends Module {
   when(flags.STOR) {
     memoryInput.data  := DR
     memoryInput.write := true.B
-  }
+    printf(cf"$IP | $CR | $AR | $DR | $SP | $BR | $AC | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} || $AR | $DR \n")
+  }.otherwise(
+    printf(cf"$IP | $CR | $AR | $DR | $SP | $BR | $AC | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} ||      |\n")
+  )
 
 }
