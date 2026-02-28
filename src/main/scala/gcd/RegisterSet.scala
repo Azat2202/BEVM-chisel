@@ -26,7 +26,7 @@ object PSBits {
       ps(3),
       ps(2),
       ps(1),
-      ps(8)
+      ps(0)
     )
 }
 
@@ -59,7 +59,8 @@ class RegisterSet extends Module {
   val memoryOutput = IO(Input(new MemoryOutput()))
   val output       = IO(Output(new AluInput()))
   val memoryInput  = IO(Output(new MemoryInput()))
-  val nzvcOutput   = IO(Output(new ResultAttributesBlockOutput()))
+  val nzvcInput    = IO(Input(new NZVCRegister()))
+  val nzvcOutput   = IO(Output(new NZVCRegister()))
 
   // left side
   private val AC = RegInit(UInt(16.W), 0.U)
@@ -76,15 +77,20 @@ class RegisterSet extends Module {
   private val AR = RegInit(UInt(11.W), 0.U)
 
   private val psBits = PSBits.fromPS(PS)
-  output.left         := 0.S
-  output.right        := 0.S
-  output.C            := psBits.C
-  nzvcOutput.N        := psBits.N
-  nzvcOutput.Z        := psBits.Z
-  nzvcOutput.V        := psBits.V
-  nzvcOutput.C        := psBits.C
-  nzvcOutput.data     := DontCare
-  PS                  := PS | Cat(input.N, input.Z, input.V, input.C) // setting nzvc after operation
+  output.left  := 0.S
+  output.right := 0.S
+  output.C     := psBits.C
+  nzvcOutput.N := psBits.N
+  nzvcOutput.Z := psBits.Z
+  nzvcOutput.V := psBits.V
+  nzvcOutput.C := psBits.C
+  PS           := Cat(
+    PS(PS.getWidth - 1, 4),
+    nzvcInput.N,
+    nzvcInput.Z,
+    nzvcInput.V,
+    nzvcInput.C
+  ) // setting nzvc after operation
   memoryInput.address := AR
   memoryInput.write   := false.B
   memoryInput.data    := 0.U

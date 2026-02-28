@@ -35,12 +35,13 @@ class Top extends Module {
   commutator.input            := alu.output
 
   resultAttributesBlock.input := commutator.output
-  resultAttributesBlock.nzvc  := registerSet.nzvcOutput
+  resultAttributesBlock.nzvcInput  := registerSet.nzvcOutput
 
   memory.input             := registerSet.memoryInput
 
   registerSet.memoryOutput := memory.output
   registerSet.input := resultAttributesBlock.output
+  registerSet.nzvcInput := resultAttributesBlock.nzvcOutput
 
   topOutput.data := resultAttributesBlock.output.data.asUInt
 

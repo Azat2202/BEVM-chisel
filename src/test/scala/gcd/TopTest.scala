@@ -8,24 +8,26 @@ import org.scalatest.matchers.must.Matchers
 class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
   private val memory1Addr = 0x0.U
   private val memory2Addr = 0x7FF.U
+  private val value1 = 500.U
+  private val value2 = 400.U
+  private val result = 100.U
 
   "Read two values from memory and substract them" in {
     simulate(new Top){ dut =>
-      writeMemory(dut, memory1Addr, 555.U)
-      writeMemory(dut, memory2Addr, 100.U)
+      writeMemory(dut, memory1Addr, value1)
+      writeMemory(dut, memory2Addr, value2)
 
       readMemoryToDR(dut, memory1Addr)
-      expectReg(dut, 555.U, dut.flags.RDDR)
-
+      expectReg(dut, value1, dut.flags.RDDR)
 
       moveDRToAC(dut)
-      expectReg(dut, 555.U, dut.flags.RDAC)
+      expectReg(dut, value1, dut.flags.RDAC)
 
       readMemoryToDR(dut, memory2Addr)
 
-      sumACDR(dut)
+      ACsubDR(dut)
 
-      expectReg(dut, 455.U, dut.flags.RDAC)
+      expectReg(dut, result, dut.flags.RDAC)
     }
   }
 
@@ -85,7 +87,7 @@ class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
     dut.flags.WRAC.poke(false.B)
   }
 
-  private def sumACDR(dut: Top): Unit = {
+  private def ACsubDR(dut: Top): Unit = {
     dut.flags.RDAC.poke(true.B)
     dut.flags.RDDR.poke(true.B)
     dut.flags.SORA.poke(false.B)

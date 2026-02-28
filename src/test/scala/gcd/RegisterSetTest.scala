@@ -10,10 +10,10 @@ class RegisterSetTest extends AnyFreeSpec with Matchers with ChiselSim {
   "Register should be read and written" in
     simulate(new RegisterSet) { dut =>
       dut.input.data.poke(0x5555.S)
-      dut.input.N.poke(true.B)
-      dut.input.Z.poke(true.B)
-      dut.input.V.poke(true.B)
-      dut.input.C.poke(true.B)
+      dut.nzvcInput.N.poke(true.B)
+      dut.nzvcInput.Z.poke(true.B)
+      dut.nzvcInput.V.poke(true.B)
+      dut.nzvcInput.C.poke(true.B)
 
       dut.flags.WRAC.poke(true.B)
       dut.flags.WRBR.poke(true.B)

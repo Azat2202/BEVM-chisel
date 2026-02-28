@@ -3,10 +3,6 @@ package gcd
 import chisel3._
 
 class ResultAttributesBlockOutput extends Bundle {
-  val N    = Bool()
-  val Z    = Bool()
-  val V    = Bool()
-  val C    = Bool()
   val data = SInt(16.W)
 }
 
@@ -26,24 +22,25 @@ class NZVCRegister extends Bundle {
 }
 
 class ResultAttributesBlock extends Module {
-  val input  = IO(Input(new CommutatorOutput()))
-  val flags  = IO(Input(new ResultAttributesBlockFlagsImpl()))
-  val nzvc   = IO(Input(new NZVCRegister()))
-  val output = IO(Output(new ResultAttributesBlockOutput()))
+  val input      = IO(Input(new CommutatorOutput()))
+  val flags      = IO(Input(new ResultAttributesBlockFlagsImpl()))
+  val nzvcInput  = IO(Input(new NZVCRegister()))
+  val nzvcOutput = IO(Output(new NZVCRegister()))
+  val output     = IO(Output(new ResultAttributesBlockOutput()))
 
-  output.N    := input.data < 0.S
-  output.Z    := nzvc.Z
-  output.V    := nzvc.V
-  output.C    := nzvc.C
-  output.data := input.data
+  nzvcOutput.N := input.data < 0.S
+  nzvcOutput.Z := nzvcInput.Z
+  nzvcOutput.V := nzvcInput.V
+  nzvcOutput.C := nzvcInput.C
+  output.data  := input.data
 
   when(flags.SETV) {
-    output.V := input.C ^ input.C14
+    nzvcOutput.V := input.C ^ input.C14
   }
   when(flags.SETC) {
-    output.C := input.C
+    nzvcOutput.C := input.C
   }
   when(flags.SETZ) {
-    output.Z := input.data === 0.S
+    nzvcOutput.Z := input.data === 0.S
   }
 }
