@@ -1,6 +1,7 @@
 package gcd
 
 import chisel3._
+import chisel3.simulator.EphemeralSimulator
 
 class Flags extends Bundle with AluFlags with CommutatorFlags with RegisterSetFlags with ResultAttributesBlockFlags
 
@@ -15,11 +16,11 @@ class TopOutput extends Bundle {
 
 /** Module is connecting all non-managment modules
   */
-class Top extends Module {
+class Top(memoryFileName: String = "") extends Module {
   val alu: Alu                                     = Module(new Alu())
   val commutator: Commutator                       = Module(new Commutator())
   val resultAttributesBlock: ResultAttributesBlock = Module(new ResultAttributesBlock())
-  val memory: Memory                               = Module(new Memory())
+  val memory: Memory                               = Module(new Memory(memoryFileName))
   val registerSet: RegisterSet                     = Module(new RegisterSet())
   val flags                                        = IO(Input(new Flags()))
   val topInput                                     = IO(Input(new TopInput()))

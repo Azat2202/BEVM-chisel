@@ -15,6 +15,10 @@ case class PSBits(
     C: Bool
 )
 
+class PSOutput extends Bundle {
+  val P = Bool()
+}
+
 object PSBits {
   def fromPS(ps: UInt): PSBits =
     PSBits(
@@ -59,6 +63,7 @@ class RegisterSet extends Module {
   val memoryOutput = IO(Input(new MemoryOutput()))
   val output       = IO(Output(new AluInput()))
   val memoryInput  = IO(Output(new MemoryInput()))
+  val psOutput     = IO(Output(new PSOutput()))
   val nzvcInput    = IO(Input(new NZVCRegister()))
   val nzvcOutput   = IO(Output(new NZVCRegister()))
 
@@ -84,6 +89,7 @@ class RegisterSet extends Module {
   nzvcOutput.Z := psBits.Z
   nzvcOutput.V := psBits.V
   nzvcOutput.C := psBits.C
+  psOutput.P   := psBits.P
   PS           := Cat(
     PS(PS.getWidth - 1, 4),
     nzvcInput.N,
@@ -121,9 +127,9 @@ class RegisterSet extends Module {
   when(flags.STOR) {
     memoryInput.data  := DR
     memoryInput.write := true.B
-    printf(cf"$IP | $CR | $AR | $DR | $SP | $BR | $AC | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} || $AR | $DR \n")
+    printf(cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} || $AR%x | $DR%x \n")
   }.otherwise(
-    printf(cf"$IP | $CR | $AR | $DR | $SP | $BR | $AC | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} ||      |\n")
+    printf(cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} ||      |\n")
   )
 
 }
