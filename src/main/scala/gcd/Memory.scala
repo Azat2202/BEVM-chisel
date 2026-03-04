@@ -18,8 +18,14 @@ class Memory(fileName: String = "") extends Module {
   val output = IO(Output(new MemoryOutput()))
 
   val mem: SyncReadMem[UInt] = SyncReadMem(2048, UInt(16.W)) // 2048 is size of 7FF memory
+
   if (fileName.nonEmpty)
-    loadMemoryFromFileInline(mem, getClass.getResource(fileName).getPath)
+    utils.loadMemoryFromResource(
+      getClass.getResource(fileName).getPath,
+      mem,
+      reset
+    )
+
   when(input.write) {
     mem.write(input.address, input.data)
   }

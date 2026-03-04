@@ -12,23 +12,26 @@ class ControlUnitOutput extends Bundle {
 }
 
 class ControlUnit(memoryFileName: String) extends Module {
+  private val memoryDepth = 256
+
   val top: Top                           = Module(new Top(memoryFileName))
   val controlUnitOutput                  = IO(Output(new ControlUnitOutput))
   val topFlags                           = IO(Output(new Flags()))
-  val microCodeMemory: SyncReadMem[UInt] = SyncReadMem(256, UInt(40.W))
+  val microCodeMemory: SyncReadMem[UInt] = SyncReadMem(memoryDepth, UInt(40.W))
   val MP                                 = RegInit(UInt(4.W), 0.U)
   val MR                                 = RegInit(UInt(40.W), 0.U)
 
-  loadMemoryFromFileInline(
+  utils.loadMemoryFromResource(
+    getClass.getResource("/microcode.txt").getPath,
     microCodeMemory,
-    getClass.getResource("/microcode.txt").getPath
+    reset
   )
 
   controlUnitOutput.HALT        := false.B
   top.topInput.writeToRegisters := false.B
   top.topInput.data             := false.B
 
-  MR := microCodeMemory.do_read(MP)
+  MR := microCodeMemory(MP)
   printf(cf"MP = $MP%x, MR = $MR%x\n")
   // regs read
   topFlags.RDDR := MR(0)
