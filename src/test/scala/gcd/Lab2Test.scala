@@ -9,7 +9,7 @@ import org.scalatest.matchers.must.Matchers
 class Lab2Test extends AnyFreeSpec with Matchers with ChiselSim {
   "should perform simple program from lab 2" in {
     simulate(new ControlUnit("/lab2.txt")) { dut =>
-      println(" IP |  CR |  AR |  DR |  SP |  BR |  AC | NZVC ||  AR |  DR ")
+      println(" IP |  CR  |  AR |  DR  |  SP |  BR  |  AC  | NZVC ||  AR |  DR  | MP | MR")
       dut.clock.stepUntil(dut.controlUnitOutput.HALT, 1, 1000)
     }
   }

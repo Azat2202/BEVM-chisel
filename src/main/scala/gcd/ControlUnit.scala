@@ -17,9 +17,9 @@ class ControlUnit(memoryFileName: String) extends Module {
   val top: Top                           = Module(new Top(memoryFileName))
   val controlUnitOutput                  = IO(Output(new ControlUnitOutput))
   val topFlags                           = IO(Output(new Flags()))
-  val microCodeMemory: SyncReadMem[UInt] = SyncReadMem(memoryDepth, UInt(40.W))
-  val MP                                 = RegInit(UInt(4.W), 0.U)
-  val MR                                 = RegInit(UInt(40.W), 0.U)
+  val microCodeMemory: Mem[UInt] = Mem(memoryDepth, UInt(40.W))
+  val MP                         = RegInit(UInt(8.W), 0.U)
+  val MR                         = Wire(UInt(40.W))
 
   utils.loadMemoryFromResource(
     getClass.getResource("/microcode.txt").getPath,
@@ -31,7 +31,7 @@ class ControlUnit(memoryFileName: String) extends Module {
   top.topInput.writeToRegisters := false.B
   top.topInput.data             := false.B
 
-  MR := microCodeMemory(MP)
+  MR := microCodeMemory.read(MP)
   printf(cf"MP = $MP%x, MR = $MR%x\n")
   // regs read
   topFlags.RDDR := MR(0)
@@ -87,18 +87,17 @@ class ControlUnit(memoryFileName: String) extends Module {
 
     controlUnitOutput.HALT := MR(38)
     MP := MP + 1.U
-    printf("flags\n")
+//    printf("flags\n")
   }.otherwise {
     initFlagsWithFalseValues(topFlags)
     val toCompareData  = top.topOutput.data(8, 0)
-    val toCompareInput = MR(22, 15)
+    val toCompareInput = MR(23, 16)
     val compareBit     = (toCompareData | toCompareInput) > 0.U
-    when(compareBit ^ MR(31)) {
-      MP := MR(30, 23)
-      printf(cf"move to ${MR(30,23)}%x\n")
+    printf(cf"compareBit = $compareBit%x, toCompareInput = $toCompareInput%x, toCompareData = $toCompareData%x\n")
+    when(compareBit ^ MR(32)) {
+      MP := MR(31, 24)
     }.otherwise{
       MP := MP + 1.U
-      printf(cf"move to ${MP + 1.U}%x\n")
     }
   }
 
