@@ -43,7 +43,7 @@ class ControlUnit(memoryFileName: String) extends Module {
   topFlags.RDPS := MR(6)
   topFlags.RDIR := MR(7)
 
-  when(MR(39)) {
+  when(!MR(39)) {
     // ALU
     topFlags.COMR := MR(8)
     topFlags.COML := MR(9)
@@ -86,6 +86,8 @@ class ControlUnit(memoryFileName: String) extends Module {
 //    topFlags.RDDR := MR(0)
 
     controlUnitOutput.HALT := MR(38)
+    MP := MP + 1.U
+    printf("flags\n")
   }.otherwise {
     initFlagsWithFalseValues(topFlags)
     val toCompareData  = top.topOutput.data(8, 0)
@@ -93,7 +95,11 @@ class ControlUnit(memoryFileName: String) extends Module {
     val compareBit     = (toCompareData | toCompareInput) > 0.U
     when(compareBit ^ MR(31)) {
       MP := MR(30, 23)
-    }.otherwise(MP := MP + 1.U)
+      printf(cf"move to ${MR(30,23)}%x\n")
+    }.otherwise{
+      MP := MP + 1.U
+      printf(cf"move to ${MP + 1.U}%x\n")
+    }
   }
 
   top.flags := topFlags
