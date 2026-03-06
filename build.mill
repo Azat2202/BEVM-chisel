@@ -15,20 +15,20 @@ import mill.bsp._
 
 object `BEVM-chisel` extends SbtModule { m =>
   override def millSourcePath = super.millSourcePath / os.up
-  override def scalaVersion = "2.13.18"
-  def chiselVersion = "7.7.0"
-  override def scalacOptions = Seq(
+  override def scalaVersion   = "2.13.18"
+  def chiselVersion           = "7.7.0"
+  override def scalacOptions  = Seq(
     "-language:reflectiveCalls",
     "-deprecation",
     "-feature",
     "-Xcheckinit",
-    "-Ymacro-annotations",
+    "-Ymacro-annotations"
   )
   override def ivyDeps = Agg(
-    ivy"org.chipsalliance::chisel:$chiselVersion",
+    ivy"org.chipsalliance::chisel:$chiselVersion"
   )
   override def scalacPluginIvyDeps = Agg(
-    ivy"org.chipsalliance:::chisel-plugin:$chiselVersion",
+    ivy"org.chipsalliance:::chisel-plugin:$chiselVersion"
   )
   object test extends SbtTests with TestModule.ScalaTest {
     override def ivyDeps = m.ivyDeps() ++ Agg(

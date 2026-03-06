@@ -5,15 +5,15 @@ import chisel3.simulator.scalatest.ChiselSim
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.must.Matchers
 
-class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
+class TopTest extends AnyFreeSpec with Matchers with ChiselSim {
   private val memory1Addr = 0x0.U
-  private val memory2Addr = 0x7FF.U
-  private val value1 = 500.U
-  private val value2 = 400.U
-  private val result = 100.U
+  private val memory2Addr = 0x7ff.U
+  private val value1      = 500.U
+  private val value2      = 400.U
+  private val result      = 100.U
 
-  "Read two values from memory and substract them" in {
-    simulate(new Top){ dut =>
+  "Read two values from memory and substract them" in
+    simulate(new Top) { dut =>
       writeMemory(dut, memory1Addr, value1)
       writeMemory(dut, memory2Addr, value2)
 
@@ -29,7 +29,6 @@ class TopTest extends AnyFreeSpec with Matchers with ChiselSim{
 
       expectReg(dut, result, dut.flags.RDAC)
     }
-  }
 
   private def writeMemory(dut: Top, address: UInt, data: UInt): Unit = {
     dut.topInput.writeToRegisters.poke(true.B)

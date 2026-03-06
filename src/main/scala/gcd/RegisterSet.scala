@@ -127,9 +127,13 @@ class RegisterSet extends Module {
   when(flags.STOR) {
     memoryInput.data  := DR
     memoryInput.write := true.B
-    printf(cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} || $AR%x | $DR%x \n")
+    printf(
+      cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} || $AR%x | $DR%x \n"
+    )
   }.otherwise(
-    printf(cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} ||      |\n")
+    printf(
+      cf"$IP%x | $CR%x | $AR%x | $DR%x | $SP%x | $BR%x | $AC%x | ${psBits.N}${psBits.Z}${psBits.V}${psBits.C} ||      |\n"
+    )
   )
 
 }

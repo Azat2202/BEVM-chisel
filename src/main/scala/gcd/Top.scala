@@ -31,18 +31,18 @@ class Top(memoryFileName: String = "") extends Module {
   resultAttributesBlock.flags := flags
   registerSet.flags           := flags
 
-  alu.input                   := registerSet.output
+  alu.input := registerSet.output
 
-  commutator.input            := alu.output
+  commutator.input := alu.output
 
-  resultAttributesBlock.input := commutator.output
-  resultAttributesBlock.nzvcInput  := registerSet.nzvcOutput
+  resultAttributesBlock.input     := commutator.output
+  resultAttributesBlock.nzvcInput := registerSet.nzvcOutput
 
-  memory.input             := registerSet.memoryInput
+  memory.input := registerSet.memoryInput
 
   registerSet.memoryOutput := memory.output
-  registerSet.input := resultAttributesBlock.output
-  registerSet.nzvcInput := resultAttributesBlock.nzvcOutput
+  registerSet.input        := resultAttributesBlock.output
+  registerSet.nzvcInput    := resultAttributesBlock.nzvcOutput
 
   topOutput.data := resultAttributesBlock.output.data.asUInt
 
