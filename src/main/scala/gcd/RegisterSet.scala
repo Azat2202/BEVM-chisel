@@ -70,7 +70,7 @@ class RegisterSet extends Module {
   // left side
   private val AC = RegInit(UInt(16.W), 0.U)
   private val BR = RegInit(UInt(16.W), 0.U)
-  private val PS = RegInit(UInt(16.W), 0.U)
+  private val PS = RegInit(UInt(16.W), 0x80.U) // work = 1
   private val IR = RegInit(UInt(16.W), 0.U)
 
   // right side

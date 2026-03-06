@@ -17,7 +17,7 @@ class Memory(fileName: String = "") extends Module {
   val input  = IO(Input(new MemoryInput()))
   val output = IO(Output(new MemoryOutput()))
 
-  val mem: SyncReadMem[UInt] = SyncReadMem(2048, UInt(16.W)) // 2048 is size of 7FF memory
+  val mem: Mem[UInt] = Mem(2048, UInt(16.W)) // 2048 is size of 7FF memory
 
   if (fileName.nonEmpty)
     utils.loadMemoryFromResource(

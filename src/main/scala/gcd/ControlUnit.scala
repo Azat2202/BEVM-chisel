@@ -12,12 +12,10 @@ class ControlUnitOutput extends Bundle {
 }
 
 class ControlUnit(memoryFileName: String) extends Module {
-  private val memoryDepth = 256
-
-  val top: Top                           = Module(new Top(memoryFileName))
-  val controlUnitOutput                  = IO(Output(new ControlUnitOutput))
-  val topFlags                           = IO(Output(new Flags()))
-  val microCodeMemory: Mem[UInt] = Mem(memoryDepth, UInt(40.W))
+  val top: Top                   = Module(new Top(memoryFileName))
+  val controlUnitOutput          = IO(Output(new ControlUnitOutput))
+  val topFlags                   = IO(Output(new Flags()))
+  val microCodeMemory: Mem[UInt] = Mem(256, UInt(40.W))
   val MP                         = RegInit(UInt(8.W), 0.U)
   val MR                         = Wire(UInt(40.W))
 
@@ -32,7 +30,7 @@ class ControlUnit(memoryFileName: String) extends Module {
   top.topInput.data             := false.B
 
   MR := microCodeMemory.read(MP)
-  printf(cf"MP = $MP%x, MR = $MR%x\n")
+//  printf(cf"MP = $MP%x, MR = $MR%x ")
   // regs read
   topFlags.RDDR := MR(0)
   topFlags.RDCR := MR(1)
@@ -42,19 +40,19 @@ class ControlUnit(memoryFileName: String) extends Module {
   topFlags.RDBR := MR(5)
   topFlags.RDPS := MR(6)
   topFlags.RDIR := MR(7)
+  // ALU
+  topFlags.COMR := MR(8)
+  topFlags.COML := MR(9)
+  topFlags.PLS1 := MR(10)
+  topFlags.SORA := MR(11)
+
+  // commutator
+  topFlags.LTOL := MR(12)
+  topFlags.LTOH := MR(13)
+  topFlags.HTOL := MR(14)
+  topFlags.HTOH := MR(15)
 
   when(!MR(39)) {
-    // ALU
-    topFlags.COMR := MR(8)
-    topFlags.COML := MR(9)
-    topFlags.PLS1 := MR(10)
-    topFlags.SORA := MR(11)
-
-    // commutator
-    topFlags.LTOL := MR(12)
-    topFlags.LTOH := MR(13)
-    topFlags.HTOL := MR(14)
-    topFlags.HTOH := MR(15)
     topFlags.SEXT := MR(16)
     topFlags.SHLT := MR(17)
     topFlags.SHL0 := MR(18)
@@ -86,17 +84,18 @@ class ControlUnit(memoryFileName: String) extends Module {
 //    topFlags.RDDR := MR(0)
 
     controlUnitOutput.HALT := MR(38)
-    MP := MP + 1.U
+    MP                     := MP + 1.U
 //    printf("flags\n")
   }.otherwise {
     initFlagsWithFalseValues(topFlags)
-    val toCompareData  = top.topOutput.data(8, 0)
+
+    val toCompareData  = top.topOutput.data(7, 0)
     val toCompareInput = MR(23, 16)
-    val compareBit     = (toCompareData | toCompareInput) > 0.U
-    printf(cf"compareBit = $compareBit%x, toCompareInput = $toCompareInput%x, toCompareData = $toCompareData%x\n")
-    when(compareBit ^ MR(32)) {
+    val compareBit     = (toCompareData & toCompareInput) > 0.U
+//    printf(cf"compareBit = $compareBit%x, toCompareInput = $toCompareInput%x, toCompareData = $toCompareData%x\n")
+    when(!(compareBit ^ MR(32))) {
       MP := MR(31, 24)
-    }.otherwise{
+    }.otherwise {
       MP := MP + 1.U
     }
   }
@@ -107,16 +106,6 @@ class ControlUnit(memoryFileName: String) extends Module {
 
 object ControlUnit {
   def initFlagsWithFalseValues(topFlags: Flags) = {
-    topFlags.COMR := false.B
-    topFlags.COML := false.B
-    topFlags.PLS1 := false.B
-    topFlags.SORA := false.B
-
-    // commutator
-    topFlags.LTOL := false.B
-    topFlags.LTOH := false.B
-    topFlags.HTOL := false.B
-    topFlags.HTOH := false.B
     topFlags.SEXT := false.B
     topFlags.SHLT := false.B
     topFlags.SHL0 := false.B
